@@ -100,7 +100,7 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @RequestMapping(value="/create/user", method = RequestMethod.POST)
+    @RequestMapping(value="/create", method = RequestMethod.POST)
     public User createEmployee(@RequestBody UserDto user){
         return userService.createUser(user);
     }

@@ -1,0 +1,97 @@
+/* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+/* Centering the Form */
+.register-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #4c8bf5, #6ad3fa);
+}
+
+/* Form Box */
+.register-box {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    width: 380px;
+    text-align: center;
+}
+
+/* Heading */
+.register-box h2 {
+    margin-bottom: 20px;
+    color: #333;
+    font-weight: 600;
+}
+
+/* Input Group */
+.input-group {
+    display: flex;
+    align-items: center;
+    background: #f7f7f7;
+    border-radius: 5px;
+    padding: 12px;
+    margin-bottom: 15px;
+}
+
+.input-group .icon {
+    color: #4c8bf5;
+    font-size: 18px;
+    margin-right: 10px;
+}
+
+.input-group input {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 16px;
+    width: 100%;
+}
+
+/* Button */
+.register-box button {
+    width: 100%;
+    padding: 12px;
+    background: #4c8bf5;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 16px;
+}
+
+.register-box button:hover {
+    background: #3672d8;
+}
+
+/* Message */
+.message {
+    margin-top: 10px;
+    font-weight: bold;
+    color: red;
+}
+
+/* Login Link */
+.login-link {
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+.login-link a {
+    color: #4c8bf5;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.login-link a:hover {
+    text-decoration: underline;
+}

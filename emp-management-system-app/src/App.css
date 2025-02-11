@@ -1,0 +1,19 @@
+/* Dark Mode Styles */
+body.dark-mode {
+  background-color: #1e1e1e;
+  color: white;
+}
+
+.dark-mode .navbar {
+  background-color: #333 !important;
+}
+
+.dark-mode .navbar-brand,
+.dark-mode .nav-link {
+  color: white !important;
+}
+
+.dark-mode .btn-outline-secondary {
+  color: white !important;
+  border-color: white !important;
+}

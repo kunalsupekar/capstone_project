@@ -1,6 +1,5 @@
 package com.ems.service.serviceImpl;
 
-import java.security.Timestamp;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.HashSet;
@@ -73,6 +72,9 @@ public class UserServiceImpl implements UserDetailsService,UserService {
         User user = userDao.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
+        // Send the email *after* successful retrieval of user details
+        sendLoginConfirmationEmail(user);  // Call the new method
+
         return org.springframework.security.core.userdetails.User
         	    .withUsername(user.getEmail())
         	    .password(user.getPassword()) // Ensure password is encoded
@@ -83,10 +85,24 @@ public class UserServiceImpl implements UserDetailsService,UserService {
         	    .disabled(false)
         	    .build();
     }
+
+    private void sendLoginConfirmationEmail(User user) {
+        String toEmail = user.getEmail();
+        String subject = "Welcome to EMS - Login Confirmation";
+        String body = "<html><body>"
+                    + "<p>Dear " + user.getFirstName() + ",</p>"  // Assuming User has a firstName
+                    + "<p>Thank you for logging into the Employee Management System!</p>"
+                    + "<p>If you did not initiate this login, please contact us immediately.</p>"
+                    + "<p>Best regards,<br/>The EMS Team</p>"
+                    + "</body></html>";
+
+        String result = sendHtmlEmail(toEmail, subject, body);
+        System.out.println("Email sending result: " + result); // Log the result
+    }
     
     private List<SimpleGrantedAuthority> mapRolesToAuthorities(Set<Role> roles) {
         return roles.stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName())) // Ensure ROLE_ prefix
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName())) // Ensure ROLE_prefix
                 .collect(Collectors.toList());
     }
 
@@ -111,7 +127,7 @@ public class UserServiceImpl implements UserDetailsService,UserService {
         Role userRole = roleService.findByName("USER");
         roles.add(userRole);
 
-        if (userDto.getEmail().endsWith("@admin.edu")) {
+        if (userDto.getEmail().endsWith("@mitaoe.ac.in")) {
             Role adminRole = roleService.findByName("ADMIN");
             roles.add(adminRole);
         }
@@ -138,6 +154,20 @@ public class UserServiceImpl implements UserDetailsService,UserService {
         user.setRegisteredAt(Instant.now());
 
         User savedUser = userDao.save(user);
+
+        // Send Registration Email
+
+         String toEmail = savedUser.getEmail();
+         String subject = "Welcome to EMS - Registration Confirmation";
+         String body = "<html><body>"
+                     + "<p>Dear " + savedUser.getFirstName() + ",</p>" 
+                     + "<p>Thank you for registering with the Employee Management System!</p>"
+                     + "<p>We are excited to have you on board.</p>"
+                     + "<p>Best regards,<br/>The EMS Team</p>"
+                     + "</body></html>";
+
+         String result = sendHtmlEmail(toEmail, subject, body);
+         System.out.println("Email sending result: " + result); 
 
         // Print registration time
         System.out.println("User registered at: " + savedUser.getRegisteredAt());
