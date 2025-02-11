@@ -32,7 +32,7 @@ public class EmailService {
                     + "<p>We kindly request you to review their registration details and approve their access accordingly.</p>"
                     + "<p>Please log in to the <a href='[ADMIN_PANEL_URL]' style='color: #007bff; text-decoration: none;'>Admin Panel</a> to complete the approval process.</p>"
                     + "<p>If you have any questions or require further information, please feel free to reach out.</p>"
-                    + "<p style='margin-top: 20px;'>Best regards,<br><strong>The [Your Company Name] Team</strong></p>"
+                    + "<p style='margin-top: 20px;'>Best regards,<br><strong></hr></strong></p>"
                     + "</body></html>";
 
             helper.setTo(adminEmails.toArray(new String[0])); // Convert list to array

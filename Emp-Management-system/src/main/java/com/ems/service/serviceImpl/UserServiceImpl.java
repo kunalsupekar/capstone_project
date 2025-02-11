@@ -85,7 +85,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 		user.setRoles(roles);
 
 		User user2 = userDao.save(user);
-		emailService.sendEmailToAdmins(adminList, user2.getFirstName());
+	//	emailService.sendEmailToAdmins(adminList, user2.getFirstName());
 		return user2;
 
 	}
@@ -110,7 +110,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 		List<String> adminList = new ArrayList<>();
 		adminList.add("abhishek.bhosale@mitaoe.ac.in");
 
-		emailService.sendEmailToAdmins(adminList, savedUser.getFirstName());
+		//emailService.sendEmailToAdmins(adminList, savedUser.getFirstName());
 		return savedUser;
 	}
 
