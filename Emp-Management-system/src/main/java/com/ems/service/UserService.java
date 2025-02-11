@@ -22,7 +22,7 @@ public interface UserService {
 
 	User createUser(UserDto user);
 
-	String sendHtmlEmail(String toEmail, String subject, String body);
+	//String sendHtmlEmail(String toEmail, String subject, String body);
 
 	public UserDetails loadUserByUsername(String email);
 	

@@ -25,7 +25,6 @@ import com.ems.model.AuthToken;
 import com.ems.model.LoginUser;
 import com.ems.model.User;
 import com.ems.model.UserDto;
-import com.ems.repository.UserDao;
 import com.ems.service.UserService;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -67,8 +66,6 @@ public class UserController {
 
     
     
-    @Autowired
-    private UserDao userDao;
 
     /**
      * Saves a new user.
