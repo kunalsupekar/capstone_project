@@ -15,16 +15,21 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ems.config.TokenProvider;
 import com.ems.model.AuthToken;
 import com.ems.model.LoginUser;
 import com.ems.model.User;
 import com.ems.model.UserDto;
+import com.ems.service.FileUploaderService;
 import com.ems.service.UserService;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -107,6 +112,21 @@ public class UserController {
     public List<User> getAllList(){
         return userService.findAll();
     }
+    
+    @GetMapping("/admins")
+    public List<User> getAllAdmins() {
+        return userService.findAllAdmins(); // ✅ Returns list of admin users
+    }
+    
+    
+    @Autowired
+    private FileUploaderService fileUploaderService;
+
+    @PostMapping("/upload")
+    public List<User> uploadUsers(@RequestParam("file") MultipartFile file) {
+        return fileUploaderService.uploadAndCreateUsers(file);
+    }
+    
     
    
 }

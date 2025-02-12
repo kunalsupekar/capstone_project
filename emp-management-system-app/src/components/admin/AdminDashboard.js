@@ -1,3 +1,4 @@
+// AdminDashboard.js
 import React from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import AdminSidebar from "./AdminSidebar";
@@ -6,6 +7,8 @@ import useAuth from "./useAuth";
 import CreateEmployee from "./CreateEmployee";
 import FindUser from "./FindUser";
 import ManageUsers from "./ManageUsers";
+import UploadCSV from "./UploadCSV"; // Import the new component
+import EditUserProfile from "./EditUserProfile";
 
 export default function AdminDashboard() {
   useAuth("ROLE_ADMIN"); // Ensure only Admin can access this page
@@ -33,15 +36,15 @@ export default function AdminDashboard() {
           </button>
         </div>
 
-        {/* Default View: Show All Users List on Dashboard */}
-        
-
         {/* Routes for Admin Pages */}
         <Routes>
           <Route path="create-employee" element={<CreateEmployee />} />
           <Route path="find-user" element={<FindUser />} />
           <Route path="find-all" element={<AllUserList />} />
+          <Route path="edit/:userId" element={<EditUserProfile />} />
+
           <Route path="manage-users" element={<ManageUsers />} />
+          <Route path="upload-csv" element={<UploadCSV />} /> {/* Add the route for CSV upload */}
         </Routes>
       </div>
     </div>

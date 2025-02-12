@@ -10,7 +10,7 @@ export default function ManageUsers() {
     const fetchUsers = async () => {
       try {
         const token = sessionStorage.getItem("jwtToken");
-        const response = await axios.get("http://localhost:8081/users/find/all", {
+        const response = await axios.get("http://localhost:8999/users/find/all", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUsers(response.data);

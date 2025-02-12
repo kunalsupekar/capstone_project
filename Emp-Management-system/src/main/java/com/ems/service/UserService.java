@@ -3,6 +3,7 @@ package com.ems.service;
 import java.util.List;
 
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ems.model.User;
 import com.ems.model.UserDto;
@@ -25,6 +26,13 @@ public interface UserService {
 	//String sendHtmlEmail(String toEmail, String subject, String body);
 
 	public UserDetails loadUserByUsername(String email);
+	
+	List<User> findAllAdmins();
+	
+	
+	//public List<User> uploadAndCreateUsers(MultipartFile file);
+	
+	User getUserByEmail(String email);
 	
 	
 }

@@ -1,5 +1,8 @@
 package com.ems.service.serviceImpl;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -7,6 +10,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -16,6 +22,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ems.model.Role;
 import com.ems.model.User;
@@ -63,6 +70,13 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 	public List<User> findAll() {
 		return (List<User>) userDao.findAll();
 	}
+	
+	
+	@Override
+	public List<User> findAllAdmins() {
+	    return userDao.findAllAdmins(); // 
+	}
+	
 
 	@Transactional
 	@Override
@@ -85,7 +99,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 		user.setRoles(roles);
 
 		User user2 = userDao.save(user);
-	//	emailService.sendEmailToAdmins(adminList, user2.getFirstName());
+		emailService.sendEmailToAdmins(adminList, user2.getFirstName());
 		return user2;
 
 	}
@@ -110,8 +124,19 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 		List<String> adminList = new ArrayList<>();
 		adminList.add("abhishek.bhosale@mitaoe.ac.in");
 
-		//emailService.sendEmailToAdmins(adminList, savedUser.getFirstName());
+		emailService.sendEmailToAdmins(adminList, savedUser.getFirstName());
 		return savedUser;
 	}
+
+	@Override
+	public User getUserByEmail(String email) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	
+	
+	
+	
 
 }
