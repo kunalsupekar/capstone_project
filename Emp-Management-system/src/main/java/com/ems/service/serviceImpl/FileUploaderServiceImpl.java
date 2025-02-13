@@ -25,6 +25,7 @@ import com.ems.repository.UserDao;
 import com.ems.service.EmailService;
 import com.ems.service.FileUploaderService;
 import com.ems.service.RoleService;
+import com.ems.service.UserService;
 
 @Service
 public class FileUploaderServiceImpl implements FileUploaderService {
@@ -34,6 +35,9 @@ public class FileUploaderServiceImpl implements FileUploaderService {
 
     @Autowired
     private RoleService roleService;
+    
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private EmailService emailService;
@@ -85,10 +89,19 @@ public class FileUploaderServiceImpl implements FileUploaderService {
                 createdUsers.add(savedUser);
 
                 // Send email notification to admins
-                List<String> adminList = new ArrayList<>();
-                adminList.add("abhishek.bhosale@mitaoe.ac.in");
+//                List<String> adminList = new ArrayList<>();
+//                adminList.add("abhishek.bhosale@mitaoe.ac.in");
+                
+                List<User> adminEmaiList=userService.findAllAdmins();
+                
+                List<String> emaiList=adminEmaiList.stream()
+                .map(us -> us.getEmail())
+                .toList();
+                
+                System.out.println(emaiList);
+                
 
-                emailService.sendEmailToAdmins(adminList, savedUser.getFirstName());
+                emailService.sendEmailToAdmins(emaiList, savedUser.getFirstName());
             }
 
         } catch (Exception e) {

@@ -1,6 +1,7 @@
 package com.ems.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,6 +34,10 @@ public interface UserService {
 	//public List<User> uploadAndCreateUsers(MultipartFile file);
 	
 	User getUserByEmail(String email);
+	
+	public User updateUser(Long userId, UserDto updatedUserDto);
+
+	Optional<User> findByid(Long id);
 	
 	
 }

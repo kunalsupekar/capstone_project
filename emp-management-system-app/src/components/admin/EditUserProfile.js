@@ -7,29 +7,38 @@ export default function EditUserProfile() {
   const { userId } = useParams();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [editedUser, setEditedUser] = useState({});
+  const [editedUser, setEditedUser] = useState({
+    firstName: "",
+    lastName: "",
+    mobile: "",
+    status: "",
+  });
 
   useEffect(() => {
     fetchUser();
-  }, []);
+  }, [userId]); // ✅ Added userId as a dependency
 
   const fetchUser = async () => {
     try {
       const token = sessionStorage.getItem("jwtToken");
-      const response = await axios.get(`${API_ENDPOINTS.GET_USERS}/${userId}`, {
+      const response = await axios.get(`${API_ENDPOINTS.GET_USERBYID}/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUser(response.data);
-      setEditedUser(response.data);
+      setEditedUser({
+        firstName: response.data.firstName,
+        lastName: response.data.lastName,
+        mobile: response.data.mobile,
+        status: response.data.status,
+      });
     } catch (error) {
       console.error("Error fetching user details", error);
+      alert("Failed to fetch user details.");
     }
   };
 
   const handleChange = (field, value) => {
-    if (window.confirm(`Are you sure you want to change ${field}?`)) {
-      setEditedUser({ ...editedUser, [field]: value });
-    }
+    setEditedUser({ ...editedUser, [field]: value });
   };
 
   const handleSave = async () => {
@@ -39,9 +48,9 @@ export default function EditUserProfile() {
         headers: { Authorization: `Bearer ${token}` },
       });
       alert("User updated successfully!");
-      navigate("/");
+      navigate("/admin-dashboard/find-all"); // ✅ Adjusted redirection path
     } catch (error) {
-      console.error("Error updating user", error);
+      console.error("Error updating user:", error);
       alert("Failed to update user.");
     }
   };
@@ -51,7 +60,6 @@ export default function EditUserProfile() {
   return (
     <div className="container mt-5">
       <h2 className="text-center text-primary fw-bold">Edit User Profile</h2>
-
       <div className="card p-4 shadow-sm">
         <div className="mb-3">
           <label className="form-label">First Name</label>
@@ -83,16 +91,14 @@ export default function EditUserProfile() {
         <div className="mb-3">
           <label className="form-label">Status</label>
           <select
-            className="form-select"
+            className="form-control"
             value={editedUser.status}
             onChange={(e) => handleChange("status", e.target.value)}
           >
             <option value="ACTIVE">Active</option>
             <option value="INACTIVE">Inactive</option>
-            <option value="PENDING">Pending</option>
           </select>
         </div>
-
         <button className="btn btn-success" onClick={handleSave}>
           Save Changes
         </button>

@@ -1,18 +1,13 @@
 package com.ems.service.serviceImpl;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -22,7 +17,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.ems.model.Role;
 import com.ems.model.User;
@@ -93,13 +87,24 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 			roles.add(adminRole);
 		}
 
-		List<String> adminList = new ArrayList<>();
-		adminList.add("abhishek.bhosale@mitaoe.ac.in");
+//		List<String> adminList = new ArrayList<>();
+//		adminList.add("abhishek.bhosale@mitaoe.ac.in");
 
 		user.setRoles(roles);
 
 		User user2 = userDao.save(user);
-		emailService.sendEmailToAdmins(adminList, user2.getFirstName());
+//		emailService.sendEmailToAdmins(adminList, user2.getFirstName());
+		
+		  List<User> adminEmaiList=findAllAdmins();
+          
+          List<String> emaiList=adminEmaiList.stream()
+          .map(us -> us.getEmail())
+          .toList();
+          
+          System.out.println(emaiList);
+          
+
+          emailService.sendEmailToAdmins(emaiList, user2.getFirstName());
 		return user2;
 
 	}
@@ -121,10 +126,21 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 
 		User savedUser = userDao.save(user);
 
-		List<String> adminList = new ArrayList<>();
-		adminList.add("abhishek.bhosale@mitaoe.ac.in");
+//		List<String> adminList = new ArrayList<>();
+//		adminList.add("abhishek.bhosale@mitaoe.ac.in");
+//
+//		emailService.sendEmailToAdmins(adminList, savedUser.getFirstName());
+		
+		  List<User> adminEmaiList=findAllAdmins();
+          
+          List<String> emaiList=adminEmaiList.stream()
+          .map(us -> us.getEmail())
+          .toList();
+          
+          System.out.println(emaiList);
+          
 
-		emailService.sendEmailToAdmins(adminList, savedUser.getFirstName());
+          emailService.sendEmailToAdmins(emaiList, savedUser.getFirstName());
 		return savedUser;
 	}
 
@@ -135,7 +151,36 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 	}
 	
 	
-	
+	@Transactional
+	@Override
+	public User updateUser(Long userId, UserDto updatedUserDto) {
+	    User existingUser = userDao.findById(userId)
+	            .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+
+	    // Update allowed fields
+	    if (updatedUserDto.getFirstName() != null) {
+	        existingUser.setFirstName(updatedUserDto.getFirstName());
+	    }
+	    if (updatedUserDto.getLastName() != null) {
+	        existingUser.setLastName(updatedUserDto.getLastName());
+	    }
+	    if (updatedUserDto.getMobile() != null) {
+	        existingUser.setMobile(updatedUserDto.getMobile());
+	    }
+//	    if (updatedUserDto.getStatus() != null) {
+//	        existingUser.setStatus(updatedUserDto.getStatus());
+//	    }
+
+	    // Save updated user
+	    return userDao.save(existingUser);
+	}
+
+	@Override
+	public Optional<User> findByid(Long id) {
+		Optional<User> user=userDao.findById(id);
+		return user;
+	}
+
 	
 	
 

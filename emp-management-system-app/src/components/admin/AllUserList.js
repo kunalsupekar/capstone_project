@@ -27,29 +27,24 @@ export default function AllUserList() {
     }
   };
 
-  const handleStatusChange = (status) => {
-    setSelectedStatus(status);
-    filterUsers(status, searchQuery);
-  };
-
-  const handleSearch = () => {
-    filterUsers(selectedStatus, searchQuery);
-  };
-
-  const filterUsers = (status, query) => {
+  const filterUsers = () => {
     let filtered = users;
-    if (status !== "ALL") {
-      filtered = filtered.filter((user) => user.status === status);
+    if (selectedStatus !== "ALL") {
+      filtered = filtered.filter((user) => user.status === selectedStatus);
     }
-    if (query.trim() !== "") {
+    if (searchQuery.trim()) {
       filtered = filtered.filter(
         (user) =>
-          user.firstName.toLowerCase().includes(query.toLowerCase()) ||
-          user.lastName.toLowerCase().includes(query.toLowerCase())
+          user.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          user.lastName.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
     setFilteredUsers(filtered);
   };
+
+  useEffect(() => {
+    filterUsers();
+  }, [searchQuery, selectedStatus]);
 
   return (
     <div className="container mt-5">
@@ -69,18 +64,13 @@ export default function AllUserList() {
           <select
             className="form-select"
             value={selectedStatus}
-            onChange={(e) => handleStatusChange(e.target.value)}
+            onChange={(e) => setSelectedStatus(e.target.value)}
           >
             <option value="ALL">All Users</option>
             <option value="ACTIVE">Active Users</option>
             <option value="INACTIVE">Inactive Users</option>
             <option value="PENDING">Pending Users</option>
           </select>
-        </div>
-        <div className="col-md-2">
-          <button className="btn btn-primary w-100" onClick={handleSearch}>
-            Find User
-          </button>
         </div>
       </div>
 
