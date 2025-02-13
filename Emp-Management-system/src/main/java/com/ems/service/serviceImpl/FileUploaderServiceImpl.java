@@ -30,84 +30,75 @@ import com.ems.service.UserService;
 @Service
 public class FileUploaderServiceImpl implements FileUploaderService {
 
-    @Autowired
-    private UserDao userDao;
+	@Autowired
+	private UserDao userDao;
 
-    @Autowired
-    private RoleService roleService;
-    
-    @Autowired
-    private UserService userService;
+	@Autowired
+	private RoleService roleService;
 
-    @Autowired
-    private EmailService emailService;
+	@Autowired
+	private UserService userService;
 
-    @Autowired
-    private BCryptPasswordEncoder bcryptEncoder;
+	@Autowired
+	private EmailService emailService;
 
-    @Override
-    @Transactional
-    public List<User> uploadAndCreateUsers(MultipartFile file) {
-        List<User> createdUsers = new ArrayList<>();
+	@Autowired
+	private BCryptPasswordEncoder bcryptEncoder;
 
-        try (InputStream inputStream = file.getInputStream();
-             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-             CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader())) {
+	@Override
+	@Transactional
+	public List<User> uploadAndCreateUsers(MultipartFile file) {
+		List<User> createdUsers = new ArrayList<>();
 
-            for (CSVRecord csvRecord : csvParser) {
-                // Mapping CSV fields to UserDto
-                UserDto userDto = new UserDto();
-                userDto.setFirstName(csvRecord.get("firstName"));
-                userDto.setLastName(csvRecord.get("lastName"));
-                userDto.setEmail(csvRecord.get("email"));
-                userDto.setMobile(csvRecord.get("mobile"));
-                userDto.setPassword(csvRecord.get("password"));
-                userDto.setStatus("PENDING"); // Default status set as PENDING
+		try (InputStream inputStream = file.getInputStream();
+				BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+				CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader())) {
 
-                // If user already exists, skip
-                if (userDao.findByEmail(userDto.getEmail()).isPresent()) {
-                    continue; // Skip if user already exists
-                }
+			for (CSVRecord csvRecord : csvParser) {
+				// Mapping CSV fields to UserDto
+				UserDto userDto = new UserDto();
+				userDto.setFirstName(csvRecord.get("firstName"));
+				userDto.setLastName(csvRecord.get("lastName"));
+				userDto.setEmail(csvRecord.get("email"));
+				userDto.setMobile(csvRecord.get("mobile"));
+				userDto.setPassword(csvRecord.get("password"));
+				userDto.setStatus("PENDING"); 
 
-                // Convert UserDto to User entity
-                User user = UserDto.convertToEntity(userDto);
+				if (userDao.findByEmail(userDto.getEmail()).isPresent()) {
+					continue; // Skip if user already exists
+				}
 
-                // Assign default role
-                Set<Role> roles = new HashSet<>();
-                roles.add(roleService.findByName("USER"));
+				// Convert UserDto to User entity
+				User user = UserDto.convertToEntity(userDto);
 
-                if (userDto.getEmail().endsWith("@mitaoe.ac.in")) {
-                    roles.add(roleService.findByName("ADMIN"));
-                }
+				// Assign default role
+				Set<Role> roles = new HashSet<>();
+				roles.add(roleService.findByName("USER"));
 
-                user.setRoles(roles);
-                user.setRegisteredAt(Instant.now());
-                user.setPassword(bcryptEncoder.encode(userDto.getPassword())); // Encoding password
+				if (userDto.getEmail().endsWith("@mitaoe.ac.in")) {
+					roles.add(roleService.findByName("ADMIN"));
+				}
 
-                // Save user
-                User savedUser = userDao.save(user);
-                createdUsers.add(savedUser);
+				user.setRoles(roles);
+				user.setRegisteredAt(Instant.now());
+				user.setPassword(bcryptEncoder.encode(userDto.getPassword())); // Encoding password
 
-                // Send email notification to admins
-//                List<String> adminList = new ArrayList<>();
-//                adminList.add("abhishek.bhosale@mitaoe.ac.in");
-                
-                List<User> adminEmaiList=userService.findAllAdmins();
-                
-                List<String> emaiList=adminEmaiList.stream()
-                .map(us -> us.getEmail())
-                .toList();
-                
-                System.out.println(emaiList);
-                
+				// Save user
+				User savedUser = userDao.save(user);
+				createdUsers.add(savedUser);
+				List<User> adminEmaiList = userService.findAllAdmins();
 
-                emailService.sendEmailToAdmins(emaiList, savedUser.getFirstName());
-            }
+				List<String> emaiList = adminEmaiList.stream().map(us -> us.getEmail()).toList();
 
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to process CSV file: " + e.getMessage());
-        }
+				System.out.println(emaiList);
 
-        return createdUsers;
-    }
+				emailService.sendEmailToAdmins(emaiList, savedUser.getFirstName());
+			}
+
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to process CSV file: " + e.getMessage());
+		}
+
+		return createdUsers;
+	}
 }

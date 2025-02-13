@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ems.model.Role;
 import com.ems.model.User;
 import com.ems.model.UserDto;
+import com.ems.model.UserStatus;
 import com.ems.repository.UserDao;
 import com.ems.service.EmailService;
 import com.ems.service.RoleService;
@@ -144,11 +145,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 		return savedUser;
 	}
 
-	@Override
-	public User getUserByEmail(String email) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 	
 	
 	@Transactional
@@ -167,13 +164,19 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 	    if (updatedUserDto.getMobile() != null) {
 	        existingUser.setMobile(updatedUserDto.getMobile());
 	    }
-//	    if (updatedUserDto.getStatus() != null) {
-//	        existingUser.setStatus(updatedUserDto.getStatus());
-//	    }
+	    if (updatedUserDto.getStatus() != null) {
+	        try {
+	            UserStatus newStatus = UserStatus.valueOf(updatedUserDto.getStatus().toUpperCase()); // Convert String to Enum
+	            existingUser.setStatus(newStatus);
+	        } catch (IllegalArgumentException e) {
+	            throw new RuntimeException("Invalid user status: " + updatedUserDto.getStatus());
+	        }
+	    }
 
 	    // Save updated user
 	    return userDao.save(existingUser);
 	}
+
 
 	@Override
 	public Optional<User> findByid(Long id) {
@@ -181,6 +184,11 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 		return user;
 	}
 
+	
+	@Override
+	public Optional<User> findByEmail(String email) {
+	    return userDao.findByEmail(email);
+	}
 	
 	
 

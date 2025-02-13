@@ -33,7 +33,8 @@ public interface UserService {
 	
 	//public List<User> uploadAndCreateUsers(MultipartFile file);
 	
-	User getUserByEmail(String email);
+	Optional<User> findByEmail(String email);
+
 	
 	public User updateUser(Long userId, UserDto updatedUserDto);
 

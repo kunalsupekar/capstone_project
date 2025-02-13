@@ -63,7 +63,7 @@ export default function CreateEmployee({ fetchUsers = () => {} }) {
 
   return (
     <div className="card p-4 shadow">
-      <h2 className="text-center mb-4">Create Employee</h2>
+      <h2 className="text-center mb-4">Create User</h2>
 
       {/* ✅ Display error messages */}
       {message.text && (

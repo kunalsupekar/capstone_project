@@ -3,8 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { API_ENDPOINTS } from "../config/Config";
 
-export default function EditUserProfile() {
-  const { userId } = useParams(); // Assuming userId is actually email
+export default function EditUserProfileOwn() {
+  const { id } = useParams(); // ✅ Get User ID from URL
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [editedUser, setEditedUser] = useState({
@@ -12,35 +12,31 @@ export default function EditUserProfile() {
     lastName: "",
     email: "",
     mobile: "",
-    status: "",
   });
   const [isEditing, setIsEditing] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    console.log("Fetching user details...");
+    console.log(`Fetching user details for ID: ${id}`);
     fetchUser();
-  }, [userId]);
+  }, [id]);
 
   const fetchUser = async () => {
     try {
       const token = sessionStorage.getItem("jwtToken");
-      console.log("Token:", token);
 
       if (!token) {
-        console.error("JWT token not found!");
         alert("User is not authenticated.");
+        navigate("/login");
         return;
       }
 
-      console.log(`Fetching user details for userId: ${userId}`);
-      const response = await axios.get(`${API_ENDPOINTS.GET_USERBYID}/${encodeURIComponent(userId)}`, {
+      const response = await axios.get(`${API_ENDPOINTS.GET_USERBYID}/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       console.log("User data received:", response.data);
 
-      // Extract roles correctly
       let userRoles = [];
       if (Array.isArray(response.data.roles)) {
         userRoles = response.data.roles.map((role) => role.name.trim());
@@ -48,18 +44,15 @@ export default function EditUserProfile() {
         userRoles = [response.data.role.trim()];
       }
 
-      console.log("Processed User Roles:", userRoles);
-
       setUser(response.data);
       setEditedUser({
         firstName: response.data.firstName || "",
         lastName: response.data.lastName || "",
         email: response.data.email || "",
         mobile: response.data.mobile || "",
-        status: response.data.status || "",
       });
 
-      // Check if user has the ADMIN role
+      // ✅ Prevent admins from editing profile
       setIsAdmin(userRoles.includes("ADMIN"));
     } catch (error) {
       console.error("Error fetching user details:", error);
@@ -68,7 +61,6 @@ export default function EditUserProfile() {
   };
 
   const handleChange = (field, value) => {
-    console.log(`Updating field: ${field} with value: ${value}`);
     setEditedUser({ ...editedUser, [field]: value });
   };
 
@@ -83,12 +75,12 @@ export default function EditUserProfile() {
 
     try {
       const token = sessionStorage.getItem("jwtToken");
-      await axios.put(`http://localhost:8999/users/find/${(userId)}`, editedUser, {
+      await axios.put(`${API_ENDPOINTS.UPDATE_USER}/${id}`, editedUser, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       alert("User updated successfully!");
-      setIsEditing(false);
+      navigate(`/profile/${encodeURIComponent(editedUser.email)}`); // ✅ Redirect back to Profile Page
     } catch (error) {
       console.error("Error updating user:", error);
       alert("Failed to update user.");
@@ -99,33 +91,21 @@ export default function EditUserProfile() {
 
   return (
     <div className="container mt-5">
-      <h2 className="text-center text-primary fw-bold">User Profile</h2>
+      <h2 className="text-center text-primary fw-bold">Edit User Profile</h2>
       <div className="card p-4 shadow-sm">
         <div className="row">
           <div className="col-md-6">
             <div className="mb-3">
-              <label className="form-label">User Email</label>
-              <input type="text" className="form-control" value={userId} readOnly />
+              <label className="form-label">User ID</label>
+              <input type="text" className="form-control" value={id} readOnly />
             </div>
             <div className="mb-3">
               <label className="form-label">First Name</label>
-              <input
-                type="text"
-                className="form-control"
-                value={editedUser.firstName}
-                onChange={(e) => handleChange("firstName", e.target.value)}
-                readOnly={!isEditing}
-              />
+              <input type="text" className="form-control" value={editedUser.firstName} onChange={(e) => handleChange("firstName", e.target.value)} readOnly={!isEditing} />
             </div>
             <div className="mb-3">
               <label className="form-label">Last Name</label>
-              <input
-                type="text"
-                className="form-control"
-                value={editedUser.lastName}
-                onChange={(e) => handleChange("lastName", e.target.value)}
-                readOnly={!isEditing}
-              />
+              <input type="text" className="form-control" value={editedUser.lastName} onChange={(e) => handleChange("lastName", e.target.value)} readOnly={!isEditing} />
             </div>
           </div>
 
@@ -136,30 +116,16 @@ export default function EditUserProfile() {
             </div>
             <div className="mb-3">
               <label className="form-label">Mobile</label>
-              <input
-                type="text"
-                className="form-control"
-                value={editedUser.mobile}
-                onChange={(e) => handleChange("mobile", e.target.value)}
-                readOnly={!isEditing}
-              />
+              <input type="text" className="form-control" value={editedUser.mobile} onChange={(e) => handleChange("mobile", e.target.value)} readOnly={!isEditing} />
             </div>
             <div className="mb-3">
               <label className="form-label">Status</label>
-              <select
-                className="form-control"
-                value={editedUser.status}
-                onChange={(e) => handleChange("status", e.target.value)}
-                disabled={!isEditing}
-              >
-                <option value="ACTIVE">Active</option>
-                <option value="INACTIVE">Inactive</option>
-                <option value="PENDING">Pending</option>
-              </select>
+              <input type="text" className="form-control" value={user.status} readOnly /> {/* ✅ Status is Read-Only */}
             </div>
           </div>
         </div>
 
+        {/* ✅ Add Edit Button */}
         {!isAdmin && (
           <div className="text-center mt-3">
             {!isEditing ? (

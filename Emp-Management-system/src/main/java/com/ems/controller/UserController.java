@@ -2,6 +2,8 @@ package com.ems.controller;
 
 
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 
@@ -133,17 +135,29 @@ public class UserController {
     
     @PutMapping("/edit/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody UserDto updatedUserDto) {
-        System.out.println("abhiii");
+        System.out.println("abhiii  user edit");
     	User updatedUser = userService.updateUser(id, updatedUserDto);
         return ResponseEntity.ok(updatedUser);
     }
     
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/get/{id}")
     public ResponseEntity<Optional<User>> GetUserByUserID(@PathVariable Long id) {
-        System.out.println("abhiii");
+        System.out.println("abhiii "+id);
     	Optional<User> updatedUser = userService.findByid(id);
         return ResponseEntity.ok(updatedUser);
+    }
+    
+    
+    @GetMapping("/find/{email}")
+    public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
+        // ✅ Decode email properly
+        String decodedEmail = URLDecoder.decode(email, StandardCharsets.UTF_8);
+        System.out.println("Decoded Email: " + decodedEmail); // Debugging
+
+        Optional<User> user = userService.findByEmail(decodedEmail);
+        return user.map(ResponseEntity::ok)
+                   .orElseGet(() -> ResponseEntity.notFound().build());
     }
     
     

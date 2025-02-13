@@ -31,7 +31,7 @@ function App() {
 
   {/* ✅ Fix: Change /admin-dashboard to /admin */}
   <Route path="/admin-dashboard/*" element={<AdminDashboard />} />
-
+  <Route path="/user-dashboard/*" element={<UserDashboard />} />
   <Route path="/user-dashboard" element={<UserDashboard />} />
 </Routes>
 

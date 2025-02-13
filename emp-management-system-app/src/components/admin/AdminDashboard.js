@@ -9,6 +9,7 @@ import FindUser from "./FindUser";
 import ManageUsers from "./ManageUsers";
 import UploadCSV from "./UploadCSV"; // Import the new component
 import EditUserProfile from "./EditUserProfile";
+import ManageUserApproval from "./ManageUserApproval";
 
 export default function AdminDashboard() {
   useAuth("ROLE_ADMIN"); // Ensure only Admin can access this page
@@ -21,10 +22,10 @@ export default function AdminDashboard() {
 
       {/* Main Content */}
       <div className="flex-grow-1" style={{ marginLeft: "250px", padding: "20px" }}>
-        <h2>Admin Dashboard</h2>
+        {/* <h2>Admin Dashboard</h2> */}
 
         {/* Admin Action Buttons */}
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <button className="btn btn-primary me-2" onClick={() => navigate("/admin-dashboard/create-employee")}>
             Create Employee
           </button>
@@ -34,7 +35,7 @@ export default function AdminDashboard() {
           <button className="btn btn-danger" onClick={() => navigate("/admin-dashboard/manage-users")}>
             Manage Users
           </button>
-        </div>
+        </div> */}
 
         {/* Routes for Admin Pages */}
         <Routes>
@@ -43,6 +44,7 @@ export default function AdminDashboard() {
           <Route path="find-all" element={<AllUserList />} />
           <Route path="edit/:userId" element={<EditUserProfile />} />
 
+          <Route path="admin-approvals" element={<ManageUserApproval/>} />
     
           <Route path="manage-users" element={<ManageUsers />} />
           <Route path="upload-csv" element={<UploadCSV />} /> {/* Add the route for CSV upload */}
