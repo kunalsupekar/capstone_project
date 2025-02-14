@@ -9,7 +9,7 @@ export default function AdminSidebar() {
       <ul className="nav flex-column">
         
         <li className="nav-item">
-          <Link className="nav-link text-white" to="/admin-dashboard/dashboard">Dashboard</Link>
+          <Link className="nav-link text-white" to="/admin-dashboard">Dashboard</Link>
         </li>
 
         <li className="nav-item">

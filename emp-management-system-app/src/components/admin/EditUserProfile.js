@@ -79,7 +79,8 @@ export default function EditUserProfile() {
       alert("User updated successfully!");
       setIsEditing(false);
 
-      navigate(`/admin-dashboard/profile/${userId}`);
+      // navigate(`/admin-dashboard/profile/${userId}`);
+      navigate(`/admin-dashboard`);
     } catch (error) {
       alert("Failed to update user.");
     }
