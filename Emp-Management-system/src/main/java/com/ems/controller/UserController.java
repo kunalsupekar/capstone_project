@@ -151,5 +151,12 @@ public class UserController {
         stats.put("pendingUsers", userDao.countByStatus(UserStatus.PENDING));
         return stats;
     }
+	
+	
+	 @GetMapping("/getId/{usermail}")
+	    public ResponseEntity<Long> getUserId(@PathVariable String usermail) {
+	    	Optional<User> userId =  userService.findByEmail(usermail);
+	    	return userId.map(user -> ResponseEntity.ok(user.getId())).orElseGet(() -> ResponseEntity.notFound().build());
+	    }
 
 }

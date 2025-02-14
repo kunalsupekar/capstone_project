@@ -27,6 +27,10 @@ export default function AdminSidebar() {
         <li className="nav-item">
           <Link className="nav-link text-white" to="/admin-dashboard/upload-csv">Upload CSV</Link>
         </li>
+
+        <li className="nav-item">
+          <Link className="nav-link text-white" to="/admin-dashboard/chat">Chat</Link>
+        </li>
       </ul>
     </div>
   );

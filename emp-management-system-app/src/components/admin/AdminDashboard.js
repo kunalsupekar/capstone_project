@@ -12,6 +12,7 @@ import ManageUserApproval from "./ManageUserApproval";
 import UploadDocuments from "./UploadDocuments";
 import ViewDocuments from "./ViewDocuments";
 import AdminDashboardCards from "./AdminDashboardCards";
+import Chat from "../message/Chat";
 
 export default function AdminDashboard() {
   useAuth("ROLE_ADMIN");
@@ -35,6 +36,7 @@ export default function AdminDashboard() {
           <Route path="admin-approvals" element={<ManageUserApproval />} />
           <Route path="manage-users" element={<ManageUsers />} />
           <Route path="upload-csv" element={<UploadCSV />} />
+          <Route path="chat" element={<Chat/>} />
           <Route path="upload-documents/:userId" element={<UploadDocuments />} />
           <Route path="view-documents/:userId" element={<ViewDocuments />} />
         </Routes>

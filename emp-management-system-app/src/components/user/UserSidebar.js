@@ -20,8 +20,10 @@ export default function UserSidebar({ userEmail }) {
             <span className="nav-link text-muted">Loading...</span>
           </li>
         )}
+        
+
         <li className="nav-item">
-          <Link className="nav-link text-white" to="/user-dashboard/user-tasks">My Tasks</Link>
+          <Link className="nav-link text-white" to="/user-dashboard/chat">Chat</Link>
         </li>
       </ul>
     </div>
