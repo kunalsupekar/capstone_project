@@ -13,6 +13,7 @@ import UploadDocuments from "./UploadDocuments";
 import ViewDocuments from "./ViewDocuments";
 import AdminDashboardCards from "./AdminDashboardCards";
 import Chat from "../message/Chat";
+import AccessHistoryTable from "./AccessHistoryTable";
 
 export default function AdminDashboard() {
   useAuth("ROLE_ADMIN");
@@ -39,6 +40,7 @@ export default function AdminDashboard() {
           <Route path="chat" element={<Chat/>} />
           <Route path="upload-documents/:userId" element={<UploadDocuments />} />
           <Route path="view-documents/:userId" element={<ViewDocuments />} />
+          <Route path="accessHistory" element={<AccessHistoryTable/>}/>
         </Routes>
       </div>
     </div>

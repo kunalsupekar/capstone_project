@@ -2,6 +2,7 @@ package com.ems.controller;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -30,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ems.config.TokenProvider;
+import com.ems.model.AccessHistory;
 import com.ems.model.AuthToken;
 import com.ems.model.LoginUser;
 import com.ems.model.User;
@@ -38,6 +41,7 @@ import com.ems.model.UserStatus;
 import com.ems.repository.UserDao;
 import com.ems.service.FileUploaderService;
 import com.ems.service.UserService;
+import com.ems.service.serviceImpl.AccessHistoryServiceImpl;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -52,9 +56,12 @@ public class UserController {
 
 	@Autowired
 	private UserService userService;
-	
+
 	@Autowired
 	private UserDao userDao;
+
+	@Autowired
+	private AccessHistoryServiceImpl accessHistoryService;
 
 	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
 	public ResponseEntity<?> generateToken(@RequestBody LoginUser loginUser) throws AuthenticationException {
@@ -66,6 +73,11 @@ public class UserController {
 
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 			String token = jwtTokenUtil.generateToken(authentication);
+			
+			Long currentUserId = getUserIdWithEmail(loginUser.getEmail()).orElse(0L);
+			
+			accessHistoryService.loggedIn(currentUserId, LocalDateTime.now());
+
 			return ResponseEntity.ok(new AuthToken(token));
 
 		} catch (BadCredentialsException e) {
@@ -85,7 +97,6 @@ public class UserController {
 		return "Only Admins Can Read This";
 	}
 
-	
 	@PreAuthorize("hasRole('USER')")
 	@RequestMapping(value = "/userping", method = RequestMethod.GET)
 	public String userPing() {
@@ -104,6 +115,12 @@ public class UserController {
 		return userService.findAll();
 	}
 
+	@Secured("ADMIN")
+	@RequestMapping(value = "/accessHistory", method = RequestMethod.GET)
+	public List<AccessHistory> getAccessHistory(){
+		return accessHistoryService.getAllHistory();
+	}
+	
 	@GetMapping("/admins")
 	public List<User> getAllAdmins() {
 		return userService.findAllAdmins(); // ✅ Returns list of admin users
@@ -140,23 +157,25 @@ public class UserController {
 		Optional<User> user = userService.findByEmail(decodedEmail);
 		return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
 	}
-	
-	
-	@GetMapping("/stats")
-    public Map<String, Integer> getUserStats() {
-		System.out.println("notification");
-        Map<String, Integer> stats = new HashMap<>();
-        stats.put("activeUsers", userDao.countByStatus(UserStatus.ACTIVE));
-        stats.put("inactiveUsers", userDao.countByStatus(UserStatus.INACTIVE));
-        stats.put("pendingUsers", userDao.countByStatus(UserStatus.PENDING));
-        return stats;
-    }
-	
-	
-	 @GetMapping("/getId/{usermail}")
-	    public ResponseEntity<Long> getUserId(@PathVariable String usermail) {
-	    	Optional<User> userId =  userService.findByEmail(usermail);
-	    	return userId.map(user -> ResponseEntity.ok(user.getId())).orElseGet(() -> ResponseEntity.notFound().build());
-	    }
 
+	@GetMapping("/stats")
+	public Map<String, Integer> getUserStats() {
+		System.out.println("notification");
+		Map<String, Integer> stats = new HashMap<>();
+		stats.put("activeUsers", userDao.countByStatus(UserStatus.ACTIVE));
+		stats.put("inactiveUsers", userDao.countByStatus(UserStatus.INACTIVE));
+		stats.put("pendingUsers", userDao.countByStatus(UserStatus.PENDING));
+		return stats;
+	}
+
+	@GetMapping("/getId/{usermail}")
+	public ResponseEntity<Long> getUserId(@PathVariable String usermail) {
+		Optional<User> userId = userService.findByEmail(usermail);
+		return userId.map(user -> ResponseEntity.ok(user.getId())).orElseGet(() -> ResponseEntity.notFound().build());
+	}
+	
+	public Optional<Long> getUserIdWithEmail(String usermail) {
+		return userService.findByEmail(usermail).map(user->user.getId());
+	}
+	
 }
