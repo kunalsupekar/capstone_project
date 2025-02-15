@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import { API_ENDPOINTS } from "../config/Config";
 
 const ViewDocuments = () => {
   const { userId } = useParams(); // Email is used as userId

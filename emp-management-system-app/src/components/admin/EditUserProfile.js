@@ -18,7 +18,7 @@ export default function EditUserProfile() {
   const [isEditing, setIsEditing] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [selectedFile, setSelectedFile] = useState("");
-  const [showDocuments, setShowDocuments] = useState(false); // NEW STATE
+  const [showDocuments, setShowDocuments] = useState(false);
 
   useEffect(() => {
     fetchUser();
@@ -180,12 +180,12 @@ export default function EditUserProfile() {
         )}
       </div>
 
-      {/* View Documents Section (Now Hidden Initially) */}
-      {showDocuments && (
+      {/* View Documents Section */}
+      {showDocuments && user.files && (
         <div className="mt-4">
-          <h5>Total Files Uploaded: {user.files?.length || 0}</h5>
+          <h5>Total Files Uploaded: {user.files.length}</h5>
 
-          {user.files && user.files.length > 0 && (
+          {user.files.length > 0 && (
             <div className="mb-3">
               <label className="form-label">Select File to View</label>
               <select
@@ -218,7 +218,7 @@ export default function EditUserProfile() {
         </div>
       )}
 
-      {/* Buttons for Uploading/View Documents */}
+      {/* Upload and View Buttons */}
       <div className="text-center mt-4">
         <button
           className="btn btn-info"
@@ -227,7 +227,7 @@ export default function EditUserProfile() {
           Upload Documents
         </button>
 
-        {user.files && user.files.length > 1 && (
+        {user.files && user.files.length > 0 && (
           <button
             className="btn btn-warning ms-2"
             onClick={() => setShowDocuments(!showDocuments)}
