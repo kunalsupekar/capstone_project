@@ -6,7 +6,8 @@ const API_ENDPOINTS = {
   CREATE_EMPLOYEE: `${API_BASE_URL}/users/create`,
   FIND_USER: "/find-user",
   MANAGE_USERS: "/manage-users",
-  UPDATE_USER: `${API_BASE_URL}/users/edit`, // ✅ Added correct endpoint for updating a user
+  UPDATE_USER: `${API_BASE_URL}/users/edit`, 
+  
   GET_MESSAGES: `${API_BASE_URL}/message/getAll`,
   SEND_MESSAGES: `${API_BASE_URL}/message/add`,
   GET_CONTACTS: `${API_BASE_URL}/message/getAllContacts`,

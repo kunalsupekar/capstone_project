@@ -1,5 +1,9 @@
 package com.ems.model;
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> main
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Entity;
@@ -99,4 +103,8 @@ public class Message {
 		return "Message [id=" + id + ", senderId=" + senderId + ", receiverId=" + receiverId + ", Message=" + Message
 				+ ", time=" + time + "]";
 	}
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> main

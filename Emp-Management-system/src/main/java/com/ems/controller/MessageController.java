@@ -1,5 +1,9 @@
 package com.ems.controller;
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> main
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -71,4 +75,8 @@ public class MessageController {
 				.distinct()
 				.collect(Collectors.toList());
 	}
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> main

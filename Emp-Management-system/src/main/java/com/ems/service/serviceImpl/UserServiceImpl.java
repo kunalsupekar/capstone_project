@@ -1,7 +1,10 @@
 package com.ems.service.serviceImpl;
 
 import java.time.Instant;
+<<<<<<< HEAD
 import java.util.ArrayList;
+=======
+>>>>>>> main
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -55,6 +58,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 				.authorities(mapRolesToAuthorities(user.getRoles())) // ✅ Convert roles to GrantedAuthority
 				.accountExpired(false).accountLocked(false).credentialsExpired(false).disabled(false).build();
 	}
+<<<<<<< HEAD
 
 	private List<SimpleGrantedAuthority> mapRolesToAuthorities(Set<Role> roles) {
 		return roles.stream().map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName())) // Ensure ROLE_prefix
@@ -145,6 +149,98 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 		return savedUser;
 	}
 
+=======
+	
+	private List<SimpleGrantedAuthority> mapRolesToAuthorities(Set<Role> roles) {
+		return roles.stream().map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName())) // Ensure ROLE_prefix
+				.collect(Collectors.toList());
+	}
+
+	@Override
+	public List<User> findAll() {
+		return (List<User>) userDao.findAll();
+	}
+	
+	
+	@Override
+	public List<User> findAllAdmins() {
+	    return userDao.findAllAdmins(); // 
+	}
+	
+
+	@Transactional
+	@Override
+	public User save(UserDto userDto) {
+		User user = modelMapper.map(userDto, User.class);
+		user.setPassword(bcryptEncoder.encode(userDto.getPassword()));
+
+		Set<Role> roles = new HashSet<>();
+		Role userRole = roleService.findByName("USER");
+		roles.add(userRole);
+
+		if (userDto.getEmail().endsWith("@mitaoe.ac.in")) {
+			Role adminRole = roleService.findByName("ADMIN");
+			roles.add(adminRole);
+		}
+
+//		List<String> adminList = new ArrayList<>();
+//		adminList.add("abhishek.bhosale@mitaoe.ac.in");
+
+		user.setRoles(roles);
+
+		User user2 = userDao.save(user);
+//		emailService.sendEmailToAdmins(adminList, user2.getFirstName());
+		
+		  List<User> adminEmaiList=findAllAdmins();
+          
+          List<String> emaiList=adminEmaiList.stream()
+          .map(us -> us.getEmail())
+          .toList();
+          
+          System.out.println(emaiList);
+          
+
+          emailService.sendEmailToAdmins(emaiList, user2.getFirstName());
+		return user2;
+
+	}
+
+	@Transactional
+	@Override
+	public User createUser(UserDto userDto) {
+		User user = modelMapper.map(userDto, User.class);
+		user.setPassword(bcryptEncoder.encode(userDto.getPassword()));
+
+		// Assign only the USER role
+		Set<Role> roles = new HashSet<>();
+		Role userRole = roleService.findByName("USER");
+		roles.add(userRole);
+		user.setRoles(roles);
+
+		// Ensure registration time is set using Instant
+		user.setRegisteredAt(Instant.now());
+
+		User savedUser = userDao.save(user);
+
+//		List<String> adminList = new ArrayList<>();
+//		adminList.add("abhishek.bhosale@mitaoe.ac.in");
+//
+//		emailService.sendEmailToAdmins(adminList, savedUser.getFirstName());
+		
+		  List<User> adminEmaiList=findAllAdmins();
+          
+          List<String> emaiList=adminEmaiList.stream()
+          .map(us -> us.getEmail())
+          .toList();
+          
+          System.out.println(emaiList);
+          
+
+          emailService.sendEmailToAdmins(emaiList, savedUser.getFirstName());
+		return savedUser;
+	}
+
+>>>>>>> main
 	
 	
 	

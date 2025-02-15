@@ -5,7 +5,7 @@ import { API_ENDPOINTS } from "../config/Config";
 import { FaEdit } from "react-icons/fa";
 
 export default function EditUserProfile() {
-  const { userId } = useParams(); // Assuming userId is actually email
+  const { userId } = useParams(); // Assuming userId is email
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [editedUser, setEditedUser] = useState({
@@ -17,6 +17,8 @@ export default function EditUserProfile() {
   });
   const [isEditing, setIsEditing] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [selectedFile, setSelectedFile] = useState("");
+  const [showDocuments, setShowDocuments] = useState(false);
 
   useEffect(() => {
     fetchUser();
@@ -31,9 +33,12 @@ export default function EditUserProfile() {
         return;
       }
 
-      const response = await axios.get(`${API_ENDPOINTS.GET_USERBYID}/${encodeURIComponent(userId)}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.get(
+        `${API_ENDPOINTS.GET_USERBYID}/${encodeURIComponent(userId)}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       let userRoles = [];
       if (Array.isArray(response.data.roles)) {
@@ -67,20 +72,24 @@ export default function EditUserProfile() {
       return;
     }
 
-    const isConfirmed = window.confirm("Are you sure you want to save the changes?");
+    const isConfirmed = window.confirm(
+      "Are you sure you want to save the changes?"
+    );
     if (!isConfirmed) return;
 
     try {
       const token = sessionStorage.getItem("jwtToken");
-      await axios.put(`http://localhost:8999/users/edit/${userId}`, editedUser, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.put(
+        `http://localhost:8999/users/edit/${userId}`,
+        editedUser,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       alert("User updated successfully!");
       setIsEditing(false);
-
-      // navigate(`/admin-dashboard/profile/${userId}`);
-      navigate(`/admin-dashboard`);
+      navigate("/admin-dashboard");
     } catch (error) {
       alert("Failed to update user.");
     }
@@ -93,7 +102,10 @@ export default function EditUserProfile() {
       <div className="d-flex justify-content-between align-items-center">
         <h2 className="text-primary fw-bold">User Profile</h2>
         {!isAdmin && (
-          <button className="btn btn-outline-primary" onClick={() => setIsEditing(!isEditing)}>
+          <button
+            className="btn btn-outline-primary"
+            onClick={() => setIsEditing(!isEditing)}
+          >
             <FaEdit size={20} />
           </button>
         )}
@@ -159,33 +171,71 @@ export default function EditUserProfile() {
           </div>
         </div>
 
-        {!isAdmin && (
+        {!isAdmin && isEditing && (
           <div className="text-center mt-3">
-            {isEditing && (
-              <button className="btn btn-success me-2" onClick={handleSave}>
-                Save Changes
-              </button>
-            )}
+            <button className="btn btn-success me-2" onClick={handleSave}>
+              Save Changes
+            </button>
           </div>
         )}
       </div>
 
-     {/* Buttons for navigating to different components */}
-<div className="text-center mt-4">
-  <button
-    className="btn btn-info me-2"
-    onClick={() => navigate(`/admin-dashboard/upload-documents/${userId}`)}
-  >
-    Upload Documents
-  </button>
-  <button
-    className="btn btn-warning"
-    onClick={() => navigate(`/admin-dashboard/view-documents/${userId}`)}
-  >
-    View Documents
-  </button>
-</div>
+      {/* View Documents Section */}
+      {showDocuments && user.files && (
+        <div className="mt-4">
+          <h5>Total Files Uploaded: {user.files.length}</h5>
 
+          {user.files.length > 0 && (
+            <div className="mb-3">
+              <label className="form-label">Select File to View</label>
+              <select
+                className="form-control"
+                value={selectedFile}
+                onChange={(e) => setSelectedFile(e.target.value)}
+              >
+                <option value="">-- Select a File --</option>
+                {user.files.map((file) => (
+                  <option key={file.id} value={file.fileUrl}>
+                    {file.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {selectedFile && (
+            <div className="text-center mt-3">
+              <a
+                href={selectedFile}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary"
+              >
+                Open Selected File
+              </a>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Upload and View Buttons */}
+      <div className="text-center mt-4">
+        <button
+          className="btn btn-info"
+          onClick={() => navigate(`/admin-dashboard/upload-documents/${userId}`)}
+        >
+          Upload Documents
+        </button>
+
+        {user.files && user.files.length > 0 && (
+          <button
+            className="btn btn-warning ms-2"
+            onClick={() => setShowDocuments(!showDocuments)}
+          >
+            {showDocuments ? "Hide Documents" : "View Documents"}
+          </button>
+        )}
+      </div>
     </div>
   );
 }
