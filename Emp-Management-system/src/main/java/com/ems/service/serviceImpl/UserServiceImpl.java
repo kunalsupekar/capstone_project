@@ -21,6 +21,7 @@ import com.ems.model.Role;
 import com.ems.model.User;
 import com.ems.model.UserDto;
 import com.ems.model.UserStatus;
+import com.ems.repository.RoleDao;
 import com.ems.repository.UserDao;
 import com.ems.service.EmailService;
 import com.ems.service.RoleService;
@@ -36,7 +37,10 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 	private RoleService roleService;
 
 	@Autowired
-	private UserDao userDao; // Renamed from userRepository to avoid confusion
+	private UserDao userDao;
+	
+	@Autowired
+	private RoleDao roleDo;
 
 	@Autowired
 	private BCryptPasswordEncoder bcryptEncoder;
@@ -188,6 +192,16 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 	public Optional<User> findByEmail(String email) {
 	    return userDao.findByEmail(email);
 	}
+	
+	
+	
+	@Transactional
+    public void makeUserAdmin(Long userId) {
+        if (!userDao.existsById(userId)) {
+            throw new RuntimeException("User with ID " + userId + " not found.");
+        }
+        roleDo.makeUserAdmin(userId);
+    }
 	
 	
 

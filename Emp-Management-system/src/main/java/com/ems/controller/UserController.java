@@ -73,9 +73,9 @@ public class UserController {
 
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 			String token = jwtTokenUtil.generateToken(authentication);
-			
+
 			Long currentUserId = getUserIdWithEmail(loginUser.getEmail()).orElse(0L);
-			
+
 			accessHistoryService.loggedIn(currentUserId, LocalDateTime.now());
 
 			return ResponseEntity.ok(new AuthToken(token));
@@ -88,6 +88,7 @@ public class UserController {
 
 	@RequestMapping(value = "/register", method = RequestMethod.POST)
 	public User saveUser(@RequestBody UserDto user) {
+		user.setStatus("PENDING");
 		return userService.save(user);
 	}
 
@@ -117,10 +118,10 @@ public class UserController {
 
 	@Secured("ADMIN")
 	@RequestMapping(value = "/accessHistory", method = RequestMethod.GET)
-	public List<AccessHistory> getAccessHistory(){
+	public List<AccessHistory> getAccessHistory() {
 		return accessHistoryService.getAllHistory();
 	}
-	
+
 	@GetMapping("/admins")
 	public List<User> getAllAdmins() {
 		return userService.findAllAdmins(); // ✅ Returns list of admin users
@@ -173,9 +174,17 @@ public class UserController {
 		Optional<User> userId = userService.findByEmail(usermail);
 		return userId.map(user -> ResponseEntity.ok(user.getId())).orElseGet(() -> ResponseEntity.notFound().build());
 	}
-	
+
 	public Optional<Long> getUserIdWithEmail(String usermail) {
-		return userService.findByEmail(usermail).map(user->user.getId());
+		return userService.findByEmail(usermail).map(user -> user.getId());
 	}
 	
+	
+	
+	@PostMapping("/{userId}/make-admin")
+    public ResponseEntity<String> makeUserAdmin(@PathVariable Long userId) {
+        userService.makeUserAdmin(userId);
+        return ResponseEntity.ok("User with ID " + userId + " is now an Admin.");
+    }
+
 }

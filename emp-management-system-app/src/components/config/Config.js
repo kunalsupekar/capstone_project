@@ -7,6 +7,7 @@ const API_ENDPOINTS = {
   FIND_USER: "/find-user",
   MANAGE_USERS: "/manage-users",
   UPDATE_USER: `${API_BASE_URL}/users/edit`, 
+  MAKE_ADMIN: `${API_BASE_URL}/users`, 
   
   GET_MESSAGES: `${API_BASE_URL}/message/getAll`,
   SEND_MESSAGES: `${API_BASE_URL}/message/add`,
