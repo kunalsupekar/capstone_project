@@ -1,7 +1,6 @@
 package com.ems.service.serviceImpl;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -55,7 +54,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 				.authorities(mapRolesToAuthorities(user.getRoles())) // ✅ Convert roles to GrantedAuthority
 				.accountExpired(false).accountLocked(false).credentialsExpired(false).disabled(false).build();
 	}
-
+	
 	private List<SimpleGrantedAuthority> mapRolesToAuthorities(Set<Role> roles) {
 		return roles.stream().map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName())) // Ensure ROLE_prefix
 				.collect(Collectors.toList());
