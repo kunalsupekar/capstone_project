@@ -1,9 +1,5 @@
 package com.ems.service.serviceImpl;
 
-<<<<<<< HEAD
-=======
-
->>>>>>> main
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,8 +46,4 @@ public class MessageServiceImpl {
 				))
 				.collect(Collectors.toList());
 	}
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> main
