@@ -56,9 +56,9 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 
 		// ✅ Check if the user's status is ACTIVE (when using Enum)
 		System.out.println(UserStatus.ACTIVE);
-		if (user.getStatus() != UserStatus.ACTIVE) { // Enum comparison
-			throw new DisabledException("User account is not active. Current status: " + user.getStatus());
-		}
+//		if (user.getStatus() != UserStatus.ACTIVE) { // Enum comparison
+//			throw new DisabledException("User account is not active. Current status: " + user.getStatus());
+//		}
 
 		return org.springframework.security.core.userdetails.User.withUsername(user.getEmail())
 				.password(user.getPassword()) // Ensure password is encoded
