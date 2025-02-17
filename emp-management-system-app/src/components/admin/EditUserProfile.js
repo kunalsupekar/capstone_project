@@ -1,11 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { API_ENDPOINTS } from "../config/Config";
 import { FaEdit } from "react-icons/fa";
+import MakeAdmin from "./MakeAdmin"; // Importing the MakeAdmin component
 
 export default function EditUserProfile() {
-  const { userId } = useParams(); // Assuming userId is email
+  const { userId } = useParams();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [editedUser, setEditedUser] = useState({
@@ -20,11 +21,8 @@ export default function EditUserProfile() {
   const [selectedFile, setSelectedFile] = useState("");
   const [showDocuments, setShowDocuments] = useState(false);
 
-  useEffect(() => {
-    fetchUser();
-  }, [userId]);
-
-  const fetchUser = async () => {
+  // ✅ Wrap fetchUser in useCallback to avoid infinite re-renders
+  const fetchUser = useCallback(async () => {
     try {
       const token = sessionStorage.getItem("jwtToken");
 
@@ -60,7 +58,12 @@ export default function EditUserProfile() {
     } catch (error) {
       alert("Failed to fetch user details.");
     }
-  };
+  }, [userId]); // ✅ Only re-run if userId changes
+
+  // ✅ Call fetchUser inside useEffect after defining it
+  useEffect(() => {
+    fetchUser();
+  }, [fetchUser]); // ✅ Now no warning
 
   const handleChange = (field, value) => {
     setEditedUser({ ...editedUser, [field]: value });
@@ -89,7 +92,7 @@ export default function EditUserProfile() {
 
       alert("User updated successfully!");
       setIsEditing(false);
-      navigate("/admin-dashboard");
+      navigate("/admin-dashboard/find-all");
     } catch (error) {
       alert("Failed to update user.");
     }
@@ -176,11 +179,12 @@ export default function EditUserProfile() {
             <button className="btn btn-success me-2" onClick={handleSave}>
               Save Changes
             </button>
+
+            <MakeAdmin userId={userId} />
           </div>
         )}
       </div>
 
-      {/* View Documents Section */}
       {showDocuments && user.files && (
         <div className="mt-4">
           <h5>Total Files Uploaded: {user.files.length}</h5>
@@ -218,7 +222,6 @@ export default function EditUserProfile() {
         </div>
       )}
 
-      {/* Upload and View Buttons */}
       <div className="text-center mt-4">
         <button
           className="btn btn-info"

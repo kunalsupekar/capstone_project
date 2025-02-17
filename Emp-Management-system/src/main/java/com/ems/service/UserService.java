@@ -40,5 +40,7 @@ public interface UserService {
 
 	Optional<User> findByid(Long id);
 	
+	public void makeUserAdmin(Long userId);
+	
 	
 }

@@ -35,6 +35,12 @@ export default function AdminSidebar() {
         <li className="nav-item">
           <Link className="nav-link text-white" to="/admin-dashboard/accessHistory">Access History</Link>
         </li>
+
+        <li className="nav-item">
+          <Link className="nav-link text-white" to="/user-dashboard/dashboard">View User DashBoard</Link>
+        </li>
+
+        
       </ul>
     </div>
   );
