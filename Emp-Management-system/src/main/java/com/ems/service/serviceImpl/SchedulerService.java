@@ -1,4 +1,4 @@
-package com.ems.service;
+package com.ems.service.serviceImpl;
 
 
 import java.util.List;
@@ -9,9 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import com.ems.model.User;
-import com.ems.model.UserStatus;
+import com.ems.model.Entity.User;
 import com.ems.repository.UserDao;
+import com.ems.util.UserStatus;
 
 
 @Service
@@ -32,9 +32,4 @@ public class SchedulerService {
 
 		logger.info("Updated {} users to ACTIVE status.", users.size());
 	}
-
-//	@Scheduled(fixedRate = 10000) // 10000 milliseconds = 10 seconds
-//	public void myTask() {
-//		System.out.println("Running task every 10 seconds");
-//	}
 }

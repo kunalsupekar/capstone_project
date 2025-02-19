@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.ems.model.Message;
+import com.ems.model.Entity.Message;
 import com.ems.repository.MessageDao;
 
 @Service(value = "messageService")

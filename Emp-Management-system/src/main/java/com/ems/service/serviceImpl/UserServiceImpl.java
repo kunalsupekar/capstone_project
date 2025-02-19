@@ -18,15 +18,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ems.model.Role;
-import com.ems.model.User;
-import com.ems.model.UserDto;
-import com.ems.model.UserStatus;
+import com.ems.model.Entity.Role;
+import com.ems.model.Entity.User;
+import com.ems.model.dto.UserDto;
 import com.ems.repository.RoleDao;
 import com.ems.repository.UserDao;
-import com.ems.service.EmailService;
 import com.ems.service.RoleService;
 import com.ems.service.UserService;
+import com.ems.util.UserStatus;
 
 @Service(value = "userService")
 public class UserServiceImpl implements UserDetailsService, UserService {

@@ -1,4 +1,4 @@
-package com.ems.service;
+package com.ems.service.serviceImpl;
 
 import java.util.List;
 import jakarta.mail.MessagingException;
