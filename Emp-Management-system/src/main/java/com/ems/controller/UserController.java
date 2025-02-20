@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,28 +30,32 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ems.config.TokenProvider;
-import com.ems.model.AccessHistory;
+import com.ems.config.TokenUtil;
 import com.ems.model.AuthToken;
 import com.ems.model.LoginUser;
-import com.ems.model.User;
-import com.ems.model.UserDto;
-import com.ems.model.UserStatus;
+import com.ems.model.Entity.AccessHistory;
+import com.ems.model.Entity.User;
+import com.ems.model.dto.UserDto;
 import com.ems.repository.UserDao;
 import com.ems.service.FileUploaderService;
 import com.ems.service.UserService;
 import com.ems.service.serviceImpl.AccessHistoryServiceImpl;
+import com.ems.service.serviceImpl.AuthenticationService;
+import com.ems.util.UserStatus;
 
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * Rest Controller for users end-point
+ */
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/users")
+@Slf4j
 public class UserController {
-
+	
 	@Autowired
-	private AuthenticationManager authenticationManager;
-
-	@Autowired
-	private TokenProvider jwtTokenUtil;
+	AuthenticationService authenticationService;
 
 	@Autowired
 	private UserService userService;
@@ -63,104 +66,116 @@ public class UserController {
 	@Autowired
 	private AccessHistoryServiceImpl accessHistoryService;
 
-	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-	public ResponseEntity<?> generateToken(@RequestBody LoginUser loginUser) throws AuthenticationException {
-		System.out.println("Attempting authentication for: " + loginUser.getEmail());
+	@Autowired
+	private FileUploaderService fileUploaderService;
 
-		try {
-			Authentication authentication = authenticationManager.authenticate(
-					new UsernamePasswordAuthenticationToken(loginUser.getEmail(), loginUser.getPassword()));
+	// Authentication and Login/Registration
 
-			SecurityContextHolder.getContext().setAuthentication(authentication);
-			String token = jwtTokenUtil.generateToken(authentication);
+	@PostMapping("/authenticate")
+	public ResponseEntity<?> authenticateUser(@RequestBody LoginUser loginUser) throws AuthenticationException {
 
+		log.debug("Attempting authentication for: " + loginUser.getEmail());
+
+		Optional<AuthToken> authToken = authenticationService.generateToken(loginUser);
+
+		if (authToken.isPresent()) {
+
+			log.debug("Authentication Success for: " + loginUser.getEmail());
+
+			// Updating Access history upon authentication
 			Long currentUserId = getUserIdWithEmail(loginUser.getEmail()).orElse(0L);
-
 			accessHistoryService.loggedIn(currentUserId, LocalDateTime.now());
 
-			return ResponseEntity.ok(new AuthToken(token));
+			return ResponseEntity.ok(authToken.get());
 
-		} catch (BadCredentialsException e) {
-			System.out.println("Authentication failed: Bad credentials for user " + loginUser.getEmail());
+		} else {
+			log.error("Authentication failed: Bad credentials for user " + loginUser.getEmail());
+
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
 		}
+
 	}
 
-	@RequestMapping(value = "/register", method = RequestMethod.POST)
-	public User saveUser(@RequestBody UserDto user) {
+	@PostMapping("/register")
+	public User registerUser(@RequestBody UserDto user) {
 		user.setStatus("PENDING");
 		return userService.save(user);
 	}
 
-	@PreAuthorize("hasRole('ADMIN')")
-	@RequestMapping(value = "/adminping", method = RequestMethod.GET)
+	// ADMIN ROLE
+
+	@Secured("ADMIN")
+	@GetMapping("/adminping")
 	public String adminPing() {
 		return "Only Admins Can Read This";
 	}
 
-	@PreAuthorize("hasRole('USER')")
+	@Secured("ADMIN")
+	@PostMapping("/create")
+	public User createUser(@RequestBody UserDto user) {
+		return userService.createUser(user);
+	}
+
+	@Secured("ADMIN")
+	@GetMapping("/find/all")
+	public List<User> getAllUser() {
+		return userService.findAll();
+	}
+
+	@Secured("ADMIN")
+	@GetMapping("/accessHistory")
+	public List<AccessHistory> getAccessHistory() {
+		return accessHistoryService.getAllHistory();
+	}
+
+	// USER ROLE
+
+	@Secured("USER")
+	@GetMapping("/get/{id}")
+	public ResponseEntity<User> getUserById(@PathVariable Long id) {
+		Optional<User> updatedUser = userService.findByid(id);
+		return updatedUser
+				.map(user -> ResponseEntity.ok(user))
+				.orElse(ResponseEntity.notFound().build());
+	}
+
+	@Secured("USER")
 	@RequestMapping(value = "/userping", method = RequestMethod.GET)
 	public String userPing() {
 		return "Any User Can Read This";
 	}
 
-	@PreAuthorize("hasRole('ADMIN')")
-	@RequestMapping(value = "/create", method = RequestMethod.POST)
-	public User createEmployee(@RequestBody UserDto user) {
-		return userService.createUser(user);
-	}
-
-	@PreAuthorize("hasRole('ADMIN')")
-	@RequestMapping(value = "/find/all", method = RequestMethod.GET)
-	public List<User> getAllList() {
-		return userService.findAll();
-	}
-
-	@Secured("ADMIN")
-	@RequestMapping(value = "/accessHistory", method = RequestMethod.GET)
-	public List<AccessHistory> getAccessHistory() {
-		return accessHistoryService.getAllHistory();
-	}
+	// NO ROLE Base AUTHORIZATION
 
 	@GetMapping("/admins")
 	public List<User> getAllAdmins() {
-		return userService.findAllAdmins(); // ✅ Returns list of admin users
+		return userService.findAllAdmins();
 	}
 
-	@Autowired
-	private FileUploaderService fileUploaderService;
-
 	@PostMapping("/upload")
-	public List<User> uploadUsers(@RequestParam("file") MultipartFile file) {
+	public List<User> registerUsers(@RequestParam("file") MultipartFile file) {
 		return fileUploaderService.uploadAndCreateUsers(file);
 	}
 
 	@PutMapping("/edit/{id}")
 	public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody UserDto updatedUserDto) {
-		System.out.println("abhiii  user edit");
 		User updatedUser = userService.updateUser(id, updatedUserDto);
-		return ResponseEntity.ok(updatedUser);
-	}
-
-	@PreAuthorize("hasRole('USER')")
-	@GetMapping("/get/{id}")
-	public ResponseEntity<Optional<User>> GetUserByUserID(@PathVariable Long id) {
-		System.out.println("abhiii " + id);
-		Optional<User> updatedUser = userService.findByid(id);
 		return ResponseEntity.ok(updatedUser);
 	}
 
 	@GetMapping("/find/{email}")
 	public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
 		String decodedEmail = URLDecoder.decode(email, StandardCharsets.UTF_8);
-		System.out.println("Decoded Email: " + decodedEmail); // Debugging
-
-		Optional<User> user = userService.findByEmail(decodedEmail);
-		return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+		
+		log.debug("Decoded Email: " + decodedEmail);
+		
+		return userService.findByEmail(decodedEmail)
+				.map(ResponseEntity::ok)
+				.orElseGet(() -> ResponseEntity.notFound().build());
 	}
 
 	@GetMapping("/stats")
-	public Map<String, Integer> getUserStats() {
+	public Map<String, Integer> getUserStatus() {
 		System.out.println("notification");
 		Map<String, Integer> stats = new HashMap<>();
 		stats.put("activeUsers", userDao.countByStatus(UserStatus.ACTIVE));
@@ -170,21 +185,20 @@ public class UserController {
 	}
 
 	@GetMapping("/getId/{usermail}")
-	public ResponseEntity<Long> getUserId(@PathVariable String usermail) {
+	public ResponseEntity<Long> getUserIdByMail(@PathVariable String usermail) {
 		Optional<User> userId = userService.findByEmail(usermail);
 		return userId.map(user -> ResponseEntity.ok(user.getId())).orElseGet(() -> ResponseEntity.notFound().build());
 	}
 
+	@PostMapping("/{userId}/make-admin")
+	public ResponseEntity<String> makeUserAdmin(@PathVariable Long userId) {
+		userService.makeUserAdmin(userId);
+		return ResponseEntity.ok("User with ID " + userId + " is now an Admin.");
+	}
+
+	// UTILITY
 	public Optional<Long> getUserIdWithEmail(String usermail) {
 		return userService.findByEmail(usermail).map(user -> user.getId());
 	}
-	
-	
-	
-	@PostMapping("/{userId}/make-admin")
-    public ResponseEntity<String> makeUserAdmin(@PathVariable Long userId) {
-        userService.makeUserAdmin(userId);
-        return ResponseEntity.ok("User with ID " + userId + " is now an Admin.");
-    }
 
 }

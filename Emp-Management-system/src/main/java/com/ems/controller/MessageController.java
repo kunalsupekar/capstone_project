@@ -16,8 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ems.model.Contact;
-import com.ems.model.Message;
-import com.ems.model.User;
+import com.ems.model.Entity.Message;
 import com.ems.service.UserService;
 import com.ems.service.serviceImpl.MessageServiceImpl;
 

@@ -1,9 +1,10 @@
-package com.ems.model;
+package com.ems.model.Entity;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
+import com.ems.util.UserStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -72,8 +73,6 @@ public class User {
     @JsonManagedReference 
     private List<File> files;
     
-
-  
     @PrePersist
     protected void onCreate() {
         this.registeredAt = Instant.now(); // Use Instant.now() instead of new Timestamp(System.currentTimeMillis())
