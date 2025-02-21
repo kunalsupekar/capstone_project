@@ -3,6 +3,7 @@ package com.ems.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.ems.util.Status;
 import com.ems.util.StatusCounts;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -34,4 +35,6 @@ public interface UserService {
 	UserDto registerUser(UserDto userDto);
 
 	Optional<Long> getUserIdWithEmail(String email);
+
+	Status getUserStatusByEmail(String email);
 }

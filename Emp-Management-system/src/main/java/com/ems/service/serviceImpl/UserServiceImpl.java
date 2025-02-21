@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.ems.util.Status;
 import com.ems.util.StatusCounts;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -173,8 +174,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 
 	@Override
 	public Optional<User> findByid(Long id) {
-		Optional<User> user = userDao.findById(id);
-		return user;
+        return userDao.findById(id);
 	}
 
 	@Override
@@ -205,5 +205,15 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 	@Override
 	public Optional<Long> getUserIdWithEmail(String email) {
 		return findByEmail(email).map(User::getId);
+	}
+
+	@Override
+	public Status getUserStatusByEmail(String email) {
+		String status = userDao.getStatusByEmail(email);
+        return switch (status) {
+            case "ACTIVE" -> Status.ACTIVE;
+            case "INACTIVE" -> Status.INACTIVE;
+            default -> Status.PENDING;
+        };
 	}
 }

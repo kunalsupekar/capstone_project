@@ -9,6 +9,7 @@ import java.util.Optional;
 import com.ems.model.Entity.File;
 import com.ems.repository.FileDao;
 import com.ems.service.FileService;
+import com.ems.util.Status;
 import com.ems.util.StatusCounts;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +71,7 @@ public class UserController {
 	public ResponseEntity<?> authenticateUser(@RequestBody LoginUser loginUser) throws AuthenticationException {
 		Optional<AuthToken> authToken = authenticationService.generateToken(loginUser);
 
-		if (authToken.isPresent()) {
+		if (authToken.isPresent() && userService.getUserStatusByEmail(loginUser.getEmail())== Status.ACTIVE) {
 			log.debug("Authentication Success for: {}", loginUser.getEmail());
 
 			// Updating Access history

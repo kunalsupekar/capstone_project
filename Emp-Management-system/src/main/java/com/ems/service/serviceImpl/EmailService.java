@@ -42,12 +42,10 @@ public class EmailService {
 
             mailSender.send(message);
         } catch (MessagingException e) {
-            e.printStackTrace(); // Handle the exception properly (e.g., log it)
+            e.printStackTrace();
         }
     }
 
-    // New method to send email to user when their account is activated
-    
     @Async
     public void sendAccountActivationEmail(String userEmail, String userFirstName) {
         try {
@@ -68,7 +66,7 @@ public class EmailService {
 
             mailSender.send(message);
         } catch (MessagingException e) {
-            e.printStackTrace(); // Handle the exception properly (e.g., log it)
+            e.printStackTrace();
         }
     }
 }

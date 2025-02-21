@@ -13,8 +13,10 @@ import jakarta.transaction.Transactional;
 public interface RoleDao extends JpaRepository<Role, Long> {
 	
     Role findRoleByName(String name);
-    
-    
+
+    /**
+     * Adds the user_id, with role_id = 1 (ADMIN).
+     */
     @Modifying
     @Transactional
     @Query(value = "INSERT INTO user_roles (user_id, role_id) " +
