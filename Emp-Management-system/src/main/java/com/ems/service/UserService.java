@@ -3,6 +3,7 @@ package com.ems.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.ems.util.StatusCounts;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.ems.model.Entity.User;
@@ -18,7 +19,7 @@ public interface UserService {
 
 	List<User> findAllAdmins();
 
-	List<User> findAll();
+	List<User> getAllUser();
 
 	UserDetails loadUserByUsername(String email);
 
@@ -26,6 +27,11 @@ public interface UserService {
 
 	Optional<User> findByid(Long id);
 
-	public void makeUserAdmin(Long userId);
+	void makeUserAdmin(Long userId);
 
+	StatusCounts getStatusCounts();
+
+	UserDto registerUser(UserDto userDto);
+
+	Optional<Long> getUserIdWithEmail(String email);
 }

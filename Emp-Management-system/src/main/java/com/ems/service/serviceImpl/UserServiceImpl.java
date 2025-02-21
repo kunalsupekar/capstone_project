@@ -7,9 +7,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.ems.util.StatusCounts;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -71,7 +71,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 	}
 
 	@Override
-	public List<User> findAll() {
+	public List<User> getAllUser() {
 		return (List<User>) userDao.findAll();
 	}
 
@@ -95,13 +95,9 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 			roles.add(adminRole);
 		}
 
-//		List<String> adminList = new ArrayList<>();
-//		adminList.add("abhishek.bhosale@mitaoe.ac.in");
-
 		user.setRoles(roles);
 
 		User user2 = userDao.save(user);
-//		emailService.sendEmailToAdmins(adminList, user2.getFirstName());
 
 		List<User> adminEmaiList = findAllAdmins();
 
@@ -194,4 +190,20 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 		roleDo.makeUserAdmin(userId);
 	}
 
+	public StatusCounts getStatusCounts(){
+		return new StatusCounts(userDao.countByStatus(UserStatus.ACTIVE),
+				          userDao.countByStatus(UserStatus.INACTIVE),
+				          userDao.countByStatus(UserStatus.PENDING));
+	}
+
+	@Override
+	public UserDto registerUser(UserDto userDto) {
+		this.save(userDto);
+		return userDto;
+	}
+
+	@Override
+	public Optional<Long> getUserIdWithEmail(String email) {
+		return findByEmail(email).map(User::getId);
+	}
 }

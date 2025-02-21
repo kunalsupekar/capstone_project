@@ -40,4 +40,8 @@ public class AuthenticationService {
 		
 		}
 	}
+
+	public String getAuthenticatedUserMail(){
+		return SecurityContextHolder.getContext().getAuthentication().getName();
+	}
 }

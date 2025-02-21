@@ -6,8 +6,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import ch.qos.logback.core.encoder.EchoEncoder;
+import com.ems.model.Entity.User;
+import com.ems.repository.FileDao;
+import com.ems.repository.UserDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +27,12 @@ import com.ems.service.FileService;
 
 @Service
 public class FileServiceImpl implements FileService {
+
+    @Autowired
+    private FileDao fileDao;
+
+    @Autowired
+    private UserDao userDao;
 
     private static final Logger logger = LoggerFactory.getLogger(FileServiceImpl.class);
 
@@ -88,5 +99,14 @@ public class FileServiceImpl implements FileService {
         }
         logger.info("File successfully converted: {}", convFile.getAbsolutePath());
         return convFile;
+    }
+
+    public String uploadAndSaveFileUrl(Long userId, MultipartFile file) throws Exception {
+        User user = userDao.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User with ID " + userId + " not found"));
+        String fileUrl = uploadFile(file,userId);
+        com.ems.model.Entity.File userFile = new com.ems.model.Entity.File(user, file.getOriginalFilename(), fileUrl);
+        fileDao.save(userFile);
+        return fileUrl;
     }
 }
