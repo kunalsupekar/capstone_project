@@ -53,7 +53,7 @@ public class User {
     private String password;
 
     @Column(name = "registered_at", nullable = false, updatable = false)
-    private Instant registeredAt; // Use Instant instead of Timestamp
+    private Instant registeredAt;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
